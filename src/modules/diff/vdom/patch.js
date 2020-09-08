@@ -109,6 +109,17 @@ function isSameVnode(oldVnode, newVnode) {
     return oldVnode.key === newVnode.key && oldVnode.type === newVnode.type;
 }
 
+function keyMapByIndex(oldChildren) {
+    let map = {};
+    for (let i = 0; i < oldChildren.length; i++) {
+        let current = oldChildren[i];
+        if (current.key) {
+            map[current.key] = i;
+        }
+    }
+    return map;
+}
+
 /**
  * diff, 会对常见的dom操作做优化
  * @param {*} parent
@@ -126,15 +137,30 @@ function updateChildren(parent, oldChildren, newChildren) {
     let newEndIndex = newChildren.length - 1;
     let newEndVnode = newChildren[newEndIndex];
 
+    let map = keyMapByIndex(oldChildren);
+
     while (oldStartIndex <= oldEndIndex && newStartIndex <= newEndIndex) {
         if (isSameVnode(oldStartVnode, newStartVnode)) {
             patch(oldStartVnode, newStartVnode);
             oldStartVnode = oldChildren[++oldStartIndex];
             newStartVnode = newChildren[++newStartIndex];
-        } else {
+        } else if (isSameVnode(oldEndVnode, newEndVnode)) {
             patch(oldEndVnode, newEndVnode);
             oldEndVnode = oldChildren[--oldEndIndex];
             newEndVnode = newChildren[--newEndIndex];
+        } else if (isSameVnode(oldStartVnode, newEndVnode)) {
+            patch(oldStartVnode, newEndVnode);
+            parent.insertBefore(oldStartVnode.domElement, oldEndVnode.domElement.nextSibling);
+            oldStartVnode = oldChildren[++oldStartIndex];
+            newEndVnode = newChildren[--newEndIndex];
+        } else if (isSameVnode(oldEndVnode, newStartVnode)) {
+            patch(oldEndVnode, newStartVnode);
+            parent.insertBefore(oldEndVnode.domElement, oldStartVnode.domElement);
+            oldEndVnode = oldChildren[--oldEndIndex];
+            newStartVnode = newChildren[++newStartIndex];
+        } else {
+            // 最坏情况: 暴力比对
+            // 需要先拿到新的节点, 去老的节点中比对, 如果存在就复用, 不存在就创建插入即可
         }
     }
 

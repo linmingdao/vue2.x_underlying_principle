@@ -6,10 +6,10 @@ export default {
         let oldVnode = h(
             'ul',
             { id: 'wrapper', style: { background: '#eee', margin: '20px' }, key: 'oldul' },
-            h('li', { style: { background: 'red', height: '30px', 'line-height': '40px' } }, 'li_a'),
-            h('li', { style: { background: 'yellow', height: '30px', 'line-height': '40px' } }, 'li_b'),
-            h('li', { style: { background: 'blue', height: '30px', 'line-height': '40px' } }, 'li_c'),
-            h('li', { style: { background: 'green', height: '30px', 'line-height': '40px' } }, 'li_d')
+            h('li', { key: 'A', style: { background: 'red', height: '30px', 'line-height': '40px' } }, 'A'),
+            h('li', { key: 'B', style: { background: 'yellow', height: '30px', 'line-height': '40px' } }, 'B'),
+            h('li', { key: 'C', style: { background: 'blue', height: '30px', 'line-height': '40px' } }, 'C'),
+            h('li', { key: 'D', style: { background: 'green', height: '30px', 'line-height': '40px' } }, 'D')
         );
 
         // 将虚拟节点转换为真实节点
@@ -20,11 +20,11 @@ export default {
             let newVnode = h(
                 'ul',
                 { id: 'wrapper', style: { background: '#ccc', margin: '20px' }, key: 'newul' },
-                h('li', { style: { background: 'red', height: '30px', 'line-height': '40px' } }, 'li_a1'),
-                h('li', { style: { background: 'yellow', height: '30px', 'line-height': '40px' } }, 'li_b1'),
-                h('li', { style: { background: 'blue', height: '30px', 'line-height': '40px' } }, 'li_c1'),
-                h('li', { style: { background: 'green', height: '30px', 'line-height': '40px' } }, 'li_d1'),
-                h('li', { style: { background: 'pink', height: '30px', 'line-height': '40px' } }, 'li_e')
+                h('li', { key: 'G', style: { background: 'green', height: '30px', 'line-height': '40px' } }, 'G'),
+                h('li', { key: 'C', style: { background: 'yellow', height: '30px', 'line-height': '40px' } }, 'C'),
+                h('li', { key: 'A', style: { background: 'blue', height: '30px', 'line-height': '40px' } }, 'A'),
+                h('li', { key: 'E', style: { background: 'red', height: '30px', 'line-height': '40px' } }, 'E'),
+                h('li', { key: 'F', style: { background: 'red', height: '30px', 'line-height': '40px' } }, 'F')
             );
 
             // 更新视图
