@@ -111,17 +111,20 @@ function isSameVnode(oldVnode, newVnode) {
 
 function keyMapByIndex(oldChildren) {
     let map = {};
+
     for (let i = 0; i < oldChildren.length; i++) {
         let current = oldChildren[i];
         if (current.key) {
             map[current.key] = i;
         }
     }
+
     return map;
 }
 
 /**
- * diff, 会对常见的dom操作做优化
+ * diff, 会对常见的 dom 操作做优化,
+ * 思考用 index 当做 key 的后果, 以及没有 key 的后果
  * @param {*} parent
  * @param {*} oldChildren
  * @param {*} newChildren
@@ -140,7 +143,11 @@ function updateChildren(parent, oldChildren, newChildren) {
     let map = keyMapByIndex(oldChildren);
 
     while (oldStartIndex <= oldEndIndex && newStartIndex <= newEndIndex) {
-        if (isSameVnode(oldStartVnode, newStartVnode)) {
+        if (!oldStartVnode) {
+            oldStartVnode = oldChildren[++oldStartIndex];
+        } else if (!oldEndVnode) {
+            oldEndVnode = oldChildren[--oldEndIndex];
+        } else if (isSameVnode(oldStartVnode, newStartVnode)) {
             patch(oldStartVnode, newStartVnode);
             oldStartVnode = oldChildren[++oldStartIndex];
             newStartVnode = newChildren[++newStartIndex];
@@ -161,6 +168,19 @@ function updateChildren(parent, oldChildren, newChildren) {
         } else {
             // 最坏情况: 暴力比对
             // 需要先拿到新的节点, 去老的节点中比对, 如果存在就复用, 不存在就创建插入即可
+            let index = map[newStartVnode.key];
+            if (index === undefined) {
+                // 没有则创建, 并插入到当前 old 指针的前面, old 指针不动
+                parent.insertBefore(createDomElementFromVNode(newStartVnode), oldStartVnode.domElement);
+            } else {
+                // 有则复用, 则 old 指针向后移动, 并且 old 的位置
+                let toMoveNode = oldChildren[index];
+                patch(toMoveNode, newStartVnode);
+                parent.insertBefore(toMoveNode.domElement, oldStartVnode.domElement);
+                oldChildren[index] = undefined;
+            }
+
+            newStartVnode = newChildren[++newStartIndex];
         }
     }
 
@@ -177,5 +197,11 @@ function updateChildren(parent, oldChildren, newChildren) {
 
     if (oldStartIndex <= oldEndIndex) {
         // 删除了子节点
+        for (let i = oldStartIndex; i <= oldEndIndex; i++) {
+            let oldVnode = oldChildren[i];
+            if (oldVnode) {
+                parent.removeChild(oldVnode.domElement);
+            }
+        }
     }
 }
