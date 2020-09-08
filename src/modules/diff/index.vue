@@ -1,5 +1,5 @@
 <template>
-    <div>vdom</div>
+    <div></div>
 </template>
 <script src="./script.js"></script>
 <style scoped src="./style.css"></style>
